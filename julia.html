@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>be my valentine</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Inter:wght@300&display=swap" rel="stylesheet">
+
+  <style>
+    /* 1. Define the backgrounds clearly here */
+    :root {
+      --bg1: linear-gradient(180deg, #3a0a0a, #120404);
+      --bg2: linear-gradient(180deg, #4a0f12, #1a0507);
+      --bg3: linear-gradient(180deg, #6a111b, #26070b);
+      --bg4: radial-gradient(circle at center, #b61f36, #3a080f);
+    }
+
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Default background to ensure something shows immediately */
+      background: var(--bg1);
+      transition: background 1.5s ease;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden; /* Hides scrollbars */
+    }
+
+    /* 2. Corner Image Styling */
+    .corner-img {
+      position: fixed; /* Fixes them to the viewport */
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border: 8px solid white; /* Polaroid border */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      transition: opacity 1s ease, transform 1s ease;
+      opacity: 0; /* Hidden by default */
+      z-index: 1; /* Behind the card if they overlap */
+    }
+
+    /* Positioning the 4 corners */
+    .top-left { top: 20px; left: 20px; transform: rotate(-6deg) scale(0.9); }
+    .top-right { top: 20px; right: 20px; transform: rotate(6deg) scale(0.9); }
+    .bottom-left { bottom: 20px; left: 20px; transform: rotate(4deg) scale(0.9); }
+    .bottom-right { bottom: 20px; right: 20px; transform: rotate(-4deg) scale(0.9); }
+
+    /* The "Active" class to show images */
+    .show-img {
+      opacity: 1;
+      transform: rotate(var(--rot)) scale(1);
+    }
+
+    .card {
+      background: rgba(255, 245, 247, 0.96);
+      padding: 60px 40px;
+      border-radius: 22px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+      z-index: 10; /* Ensures card is above images */
+      animation: fadeIn 1.5s ease;
+    }
+
+    h1 {
+      font-family: 'Libre Baskerville', serif;
+      color: #7b0d1e;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #5a1a1a;
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      white-space: pre-line;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    button {
+      padding: 12px 32px;
+      font-size: 15px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .primary { background: #7b0d1e; color: white; }
+    .secondary { background: transparent; color: #7b0d1e; border: 1px solid rgba(123, 13, 30, 0.3); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      .corner-img { width: 110px; height: 110px; border-width: 4px; }
+      .card { padding: 40px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <img id="imgTL" class="corner-img top-left" style="--rot: -6deg">
+  <img id="imgTR" class="corner-img top-right" style="--rot: 6deg">
+  <img id="imgBL" class="corner-img bottom-left" style="--rot: 4deg">
+  <img id="imgBR" class="corner-img bottom-right" style="--rot: -4deg">
+
+  <div class="card">
+    <h1 id="title"></h1>
+    <p id="text"></p>
+
+    <div class="buttons" id="btnContainer">
+      <button class="primary" onclick="nextStage()">continue</button>
+      <button class="secondary" onclick="softNo()">not yet</button>
+    </div>
+  </div>
+
+  <script>
+    let stage = 0;
+
+    // 4. EXACT FILENAMES from your screenshot (Case Sensitive!)
+    const stages = [
+      {
+        bg: "var(--bg1)",
+        title: "Julia",
+        text: "I love you.\nI really, really do.",
+        // First 4 images
+        images: ["img/IMG_1008.jpeg", "img/IMG_1426.jpeg", "img/IMG_5025.jpeg", "img/IMG_5347.jpeg"]
+      },
+      {
+        bg: "var(--bg2)",
+        title: "More than you know",
+        text: "More than words.\nMore than moments.\nMore than I ever expected.",
+        // Next 4 images
+        images: ["img/IMG_5652.jpeg", "img/IMG_7140.jpeg", "img/IMG_9183.jpeg", "img/IMG_9584.jpeg"]
+      },
+      {
+        bg: "var(--bg3)",
+        title: "It’s everything about you",
+        text: "Your eyes.\nYour laugh.\nYour comments during every movie.",
+        // Last 4 images (Watch the .JPG vs .jpg here!)
+        images: ["img/SDC17570.JPG", "img/SDC17892.jpg", "img/SDC18011.jpeg", "img/SDC18263.JPG"]
+      },
+      {
+        bg: "var(--bg4)",
+        title: "So that being said",
+        text: "Will you be my Valentine?\n❤️",
+        images: [] // Clear images for the final question
+      }
+    ];
+
+    function renderStage() {
+      const s = stages[stage];
+
+      // Update Text
+      document.getElementById("title").innerText = s.title;
+      document.getElementById("text").innerText = s.text;
+
+      // Update Background
+      document.body.style.background = s.bg;
+
+      // Update Images
+      const cornerIds = ["imgTL", "imgTR", "imgBL", "imgBR"];
+
+      // First hide existing images
+      cornerIds.forEach(id => {
+        document.getElementById(id).classList.remove("show-img");
+      });
+
+      // If this stage has images, set source and show them
+      if (s.images && s.images.length > 0) {
+        // Small timeout to allow the previous fade-out to look smooth
+        setTimeout(() => {
+          cornerIds.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (s.images[index]) {
+              el.src = s.images[index];
+              el.classList.add("show-img");
+            }
+          });
+        }, 500); // 0.5s delay
+      }
+    }
+
+    function nextStage() {
+      if (stage < stages.length - 1) {
+        stage++;
+        renderStage();
+      } else {
+        document.getElementById("btnContainer").innerHTML =
+          '<button class="primary" onclick="alert(\'I love you pretty girl\')">Yes!</button>';
+      }
+    }
+
+    function softNo() {
+      // 1. Change text to the error message
+      document.getElementById("title").innerText = "⚠️";
+      document.getElementById("text").innerText = "WRONG ANSWER RESTART";
+
+      // 2. Hide the images immediately
+      ["imgTL", "imgTR", "imgBL", "imgBR"].forEach(id => {
+        document.getElementById(id).classList.remove("show-img");
+      });
+
+      // 3. Wait 2 seconds, then reset stage to 0 and re-render
+      setTimeout(() => {
+        stage = 0;
+        renderStage();
+      }, 2000);
+    }
+
+    // Run immediately on load
+    renderStage();
+  </script>
+</body>
+</html>
